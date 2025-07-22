@@ -66,39 +66,6 @@ export default function Home() {
     }
   ];
 
-  // Industry transformations - clean, minimal
-  const industryTransformations = [
-    {
-      name: "Healthcare",
-      transformation: "Diagnostic precision meets human intuition",
-      story: "Where technology amplifies medical expertise"
-    },
-    {
-      name: "Finance",
-      transformation: "Risk assessment becomes strategic foresight",
-      story: "Turning market volatility into opportunity"
-    },
-    {
-      name: "Education",
-      transformation: "Personalized learning at institutional scale",
-      story: "Every student's journey uniquely supported"
-    },
-    {
-      name: "Logistics",
-      transformation: "Supply chains that anticipate disruption",
-      story: "Resilience built into every connection"
-    },
-    {
-      name: "Retail",
-      transformation: "Customer intent meets perfect timing",
-      story: "Commerce that feels effortless"
-    },
-    {
-      name: "Energy",
-      transformation: "Sustainability through intelligent optimization",
-      story: "Efficiency that serves both profit and planet"
-    }
-  ];
 
   // Team members data
   const teamMembers = [
@@ -171,7 +138,6 @@ export default function Home() {
   const heroRef = useRef(null);
   const storiesRef = useRef(null);
   const processRef = useRef(null);
-  const industriesRef = useRef(null);
   const testimonialRef = useRef(null);
   const principlesRef = useRef(null);
   const teamRef = useRef(null);
@@ -179,7 +145,6 @@ export default function Home() {
   const isHeroInView = useInView(heroRef, { once: true, margin: "-100px" });
   const isStoriesInView = useInView(storiesRef, { once: true, margin: "-100px" });
   const isProcessInView = useInView(processRef, { once: true, margin: "-100px" });
-  const isIndustriesInView = useInView(industriesRef, { once: true, margin: "-100px" });
   const isTestimonialInView = useInView(testimonialRef, { once: true, margin: "-100px" });
   const isPrinciplesInView = useInView(principlesRef, { once: true, margin: "-100px" });
   const isTeamInView = useInView(teamRef, { once: true, margin: "-100px" });
@@ -415,52 +380,6 @@ export default function Home() {
           </div>
         </motion.section>
 
-        {/* Industry Transformations */}
-        <motion.section 
-          ref={industriesRef}
-          className="py-20 md:py-24 lg:py-32 border-t border-gray-100"
-        >
-          <div className="max-w-7xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={isIndustriesInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-              transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-              className="text-center mb-20"
-            >
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-black leading-tight tracking-tight mb-8">
-                Industries Transformed
-              </h2>
-              <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto">
-                Each industry presents unique challenges and opportunities. Our approach adapts to the nuances of your field.
-              </p>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
-              {industryTransformations.map((industry, index) => (
-                <motion.div
-                  key={index}
-                  className="group cursor-pointer"
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={isIndustriesInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-                  transition={{ duration: 0.6, delay: 0.4 + (index * 0.1), ease: "easeOut" }}
-                  whileHover={{ y: -8 }}
-                >
-                  <div className="p-8 bg-white border border-gray-100 group-hover:border-gray-200 transition-all duration-300 h-full">
-                    <h3 className="text-xl font-semibold text-black mb-4 group-hover:text-gray-700 transition-colors duration-300">
-                      {industry.name}
-                    </h3>
-                    <p className="text-base text-gray-700 leading-relaxed mb-4">
-                      {industry.transformation}
-                    </p>
-                    <p className="text-sm text-gray-500 italic">
-                      {industry.story}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </motion.section>
 
         {/* Testimonial Section */}
         <motion.section 
