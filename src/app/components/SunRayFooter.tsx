@@ -1,208 +1,282 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function SunRayFooter() {
-  const [isMobile, setIsMobile] = useState(false);
-  const [time, setTime] = useState(0);
-  const [rayPattern, setRayPattern] = useState<string[]>([]);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>();
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
-  // Advanced ASCII character sets for flowing organic design
-  const charSets = {
-    core: ['█', '▉', '▊', '▋', '▌', '▍', '▎', '▏'],
-    rays: ['█', '▓', '▒', '░', '▱', '▫', '▪', '∙', '·', ' '],
-    flowing: ['╱', '╲', '╳', '╴', '╵', '╶', '╷', '│', '─', '┌', '┐', '└', '┘'],
-    curves: ['╭', '╮', '╯', '╰', '◜', '◝', '◞', '◟', '◠', '◡', '⌒', '⌓', '⌜', '⌝', '⌞', '⌟'],
-    organic: ['∿', '≈', '∼', '～', '〜', '⁓', '◦', '∘', '○', '●', '◯', '◉'],
-    particles: ['✧', '✦', '✱', '✲', '✳', '✴', '✵', '✶', '✷', '✸', '✹', '✺', '※', '⁎', '⁕', '⁜'],
-    energy: ['⚡', '✨', '⭐', '🌟', '💫', '⭆', '⭈', '⭊', '⟐', '⟡', '◊', '◈', '⬟', '⬢', '⬣']
+  // Sophisticated ASCII character sets for different lighting intensities
+  const asciiChars = {
+    // High detail character gradient for 3D sphere lighting
+    sphere: [' ', '·', '∙', '°', '∘', '○', '◦', '◯', '⊙', '●', '█'],
+    // Flowing ray characters
+    rays: [' ', '·', ':', '!', '|', '/', '\\', '~', '≈', '∿', '⌐', '¬', '█'],
+    // Particle and detail characters  
+    particles: ['·', '∙', '°', '*', '✧', '✦', '✱', '✲', '※', '⁎'],
+    // Edge and flowing line characters
+    flows: ['/', '\\', '|', '-', '~', '≈', '∿', '⌒', '⌓', '◠', '◡'],
+    // Complex pattern characters
+    complex: ['▲', '▼', '◀', '▶', '◆', '♦', '▪', '▫', '■', '□', '▨', '▩']
   };
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
+    const updateDimensions = () => {
+      setDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
     };
 
-    const animate = () => {
-      setTime(prev => prev + 0.02);
-      animationRef.current = requestAnimationFrame(animate);
-    };
-
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    animate();
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
     
+    return () => window.removeEventListener('resize', updateDimensions);
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || dimensions.width === 0) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Set canvas size
+    canvas.width = dimensions.width;
+    canvas.height = dimensions.height;
+
+    // ASCII rendering parameters
+    const fontSize = Math.max(6, Math.min(12, dimensions.width / 200));
+    const charWidth = fontSize * 0.6;
+    const charHeight = fontSize * 1.2;
+    const cols = Math.floor(dimensions.width / charWidth);
+    const rows = Math.floor(dimensions.height / charHeight);
+
+    // Set font and styling
+    ctx.font = `${fontSize}px 'Courier New', monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    // 3D Sun parameters
+    const sunCenterX = cols / 2;
+    const sunCenterY = rows - Math.floor(rows * 0.15); // Position at bottom like half-sun
+    const sunRadius = Math.min(cols, rows) * 0.15;
+    const lightSourceX = sunCenterX - sunRadius * 0.3;
+    const lightSourceY = sunCenterY - sunRadius * 0.5;
+
+    // Animation state for sophisticated effects
+    let time = 0;
+    let lightSourceTime = 0;
+    let atmosphericTime = 0;
+
+    // Advanced 3D sphere lighting with multiple light sources
+    const calculateSphereLighting = (x: number, y: number, z: number) => {
+      // Dynamic light source position based on time
+      const dynamicLightX = lightSourceX + Math.sin(lightSourceTime * 0.001) * 5;
+      const dynamicLightY = lightSourceY + Math.cos(lightSourceTime * 0.0008) * 3;
+      const dynamicLightZ = 50 + Math.sin(lightSourceTime * 0.0012) * 10;
+      
+      // Primary light vector
+      const lightVecX = dynamicLightX - x;
+      const lightVecY = dynamicLightY - y;  
+      const lightVecZ = dynamicLightZ - z;
+      
+      // Normal vector at sphere surface
+      const normalX = x - sunCenterX;
+      const normalY = y - sunCenterY;
+      const normalZ = z;
+      
+      // Normalize vectors
+      const lightMag = Math.sqrt(lightVecX * lightVecX + lightVecY * lightVecY + lightVecZ * lightVecZ);
+      const normalMag = Math.sqrt(normalX * normalX + normalY * normalY + normalZ * normalZ);
+      
+      if (lightMag === 0 || normalMag === 0) return 0;
+      
+      // Primary lighting
+      const dotProduct = (lightVecX * normalX + lightVecY * normalY + lightVecZ * normalZ) / (lightMag * normalMag);
+      let lighting = Math.max(0, dotProduct);
+      
+      // Secondary rim lighting
+      const rimIntensity = Math.pow(1 - Math.abs(dotProduct), 2);
+      lighting += rimIntensity * 0.3;
+      
+      
+      return Math.min(1, lighting);
+    };
+
+    // Super intricate flowing ray system with organic patterns
+    const generateRayAt = (angle: number, distance: number, time: number, rayIndex: number) => {
+      const angleRad = (angle * Math.PI) / 180;
+      
+      // Multiple wave layers for complex organic movement
+      const wave1 = Math.sin(time * 0.002 + rayIndex * 0.3 + distance * 0.01) * 4;
+      const wave2 = Math.cos(time * 0.003 + rayIndex * 0.2 + distance * 0.008) * 2.5;
+      const wave3 = Math.sin(time * 0.0025 + rayIndex * 0.15 + angle * 0.1) * 3;
+      const turbulence = Math.sin(time * 0.005 + rayIndex + distance * 0.02) * 1.5;
+      
+      const totalWave = wave1 + wave2 + wave3 + turbulence;
+      
+      // Dynamic ray width variation
+      const widthVariation = Math.sin(time * 0.001 + rayIndex * 0.4) * 2;
+      
+      // Intensity with multiple frequency components
+      const intensity1 = (Math.sin(time * 0.002 + rayIndex * 0.25) + 1) / 2;
+      const intensity2 = (Math.cos(time * 0.0015 + rayIndex * 0.35 + distance * 0.01) + 1) / 2;
+      const intensity3 = (Math.sin(time * 0.003 + angle * 0.05) + 1) / 2;
+      
+      const combinedIntensity = (intensity1 + intensity2 + intensity3) / 3;
+      
+      // Final ray position with perspective flattening
+      const rayX = sunCenterX + Math.cos(angleRad) * (distance + totalWave);
+      const rayY = sunCenterY + Math.sin(angleRad) * (distance + totalWave) * 0.25; // Strong perspective
+      
+      // Direct intensity without atmospheric falloff
+      const finalIntensity = combinedIntensity;
+      
+      return { 
+        x: rayX, 
+        y: rayY, 
+        intensity: finalIntensity,
+        width: 1 + widthVariation,
+        flow: totalWave
+      };
+    };
+
+    // ASCII rendering function
+    const renderFrame = () => {
+      time += 1;
+      
+      // Clear canvas with solid background
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Render ASCII grid
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          const x = col * charWidth;
+          const y = row * charHeight;
+          
+          let char = ' ';
+          let color = '#FFFFFF';
+          let opacity = 0.1;
+
+          // Calculate distance from sun center
+          const distanceFromSun = Math.sqrt(
+            Math.pow(col - sunCenterX, 2) + Math.pow(row - sunCenterY, 2)
+          );
+
+          // 3D Sun sphere rendering
+          if (distanceFromSun <= sunRadius) {
+            // Calculate 3D coordinates on sphere
+            const sphereX = col - sunCenterX;
+            const sphereY = row - sunCenterY;
+            const sphereZSq = sunRadius * sunRadius - sphereX * sphereX - sphereY * sphereY;
+            
+            if (sphereZSq >= 0) {
+              const sphereZ = Math.sqrt(sphereZSq);
+              const lighting = calculateSphereLighting(col, row, sphereZ);
+              
+              // Map lighting to ASCII character
+              const charIndex = Math.floor(lighting * (asciiChars.sphere.length - 1));
+              char = asciiChars.sphere[charIndex];
+              
+              // Simple color based on lighting - orange to white
+              if (lighting > 0.7) {
+                color = '#FFFFFF'; // White for bright areas
+              } else if (lighting > 0.3) {
+                color = '#FB3D01'; // Orange for medium lighting
+              } else {
+                color = '#CC3300'; // Darker orange for shadows
+              }
+              opacity = 1;
+            }
+          }
+          // Ray rendering - only in upper hemisphere
+          else if (row < sunCenterY) {
+            // Calculate ray angle from sun center
+            const rayAngle = Math.atan2(row - sunCenterY, col - sunCenterX) * 180 / Math.PI;
+            
+            // Only render rays in upper hemisphere (180-360 degrees -> -90 to 90)
+            if (rayAngle >= -90 && rayAngle <= 90) {
+              const normalizedAngle = rayAngle + 90; // Convert to 0-180
+              const rayIndex = Math.floor((normalizedAngle / 180) * 24);
+              
+              if (rayIndex >= 0 && rayIndex < 24) {
+                const rayData = generateRayAt(normalizedAngle, distanceFromSun - sunRadius, time, rayIndex);
+                
+                if (rayData.intensity > 0.1) {
+                  const wave1 = Math.sin(time * 0.001 + col * 0.1 + row * 0.05) * 0.3;
+                  const wave2 = Math.cos(time * 0.0015 + rayIndex * 0.2) * 0.2;
+                  const totalIntensity = rayData.intensity + wave1 + wave2;
+                  
+                  if (totalIntensity > 0.15) {
+                    // Select character based on intensity and flow
+                    let charSet = asciiChars.rays;
+                    if (totalIntensity > 0.7) charSet = asciiChars.complex;
+                    else if (totalIntensity > 0.4) charSet = asciiChars.flows;
+                    
+                    const charIndex = Math.floor(totalIntensity * (charSet.length - 1));
+                    char = charSet[Math.min(charIndex, charSet.length - 1)];
+                    
+                    // Simple color scheme for rays - orange to white
+                    if (totalIntensity > 0.6) {
+                      color = '#FFFFFF'; // White for bright rays
+                    } else if (totalIntensity > 0.3) {
+                      color = '#FB3D01'; // Orange for medium rays
+                    } else {
+                      color = '#CC3300'; // Darker orange for dim rays
+                    }
+                    opacity = 1;
+                  }
+                }
+              }
+            }
+          }
+
+          // Particle effects with solid colors
+          if (char === ' ' && Math.random() < 0.001) {
+            const particleIntensity = Math.random();
+            if (particleIntensity > 0.7) {
+              char = asciiChars.particles[Math.floor(Math.random() * asciiChars.particles.length)];
+              color = '#FB3D01'; // Solid orange particles
+              opacity = 1;
+            }
+          }
+
+          // Render character if visible
+          if (char !== ' ' && opacity > 0.05) {
+            ctx.fillStyle = color;
+            ctx.globalAlpha = opacity;
+            ctx.fillText(char, x + charWidth / 2, y + charHeight / 2);
+          }
+        }
+      }
+
+      ctx.globalAlpha = 1;
+      animationRef.current = requestAnimationFrame(renderFrame);
+    };
+
+    // Start animation
+    renderFrame();
+
     return () => {
-      window.removeEventListener("resize", checkMobile);
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, []);
-
-  // Generate simple, visible flowing sun pattern
-  const generateAdvancedAsciiRays = useCallback(() => {
-    const patterns = [];
-    const width = isMobile ? 80 : 120; // Reasonable size for visibility
-    const height = isMobile ? 40 : 60; 
-    const centerX = width / 2;
-    const centerY = height / 2; // Center the sun
-    const maxRadius = Math.min(width, height) * 0.4;
-    
-    for (let row = 0; row < height; row++) {
-      let line = '';
-      for (let col = 0; col < width; col++) {
-        const dx = col - centerX;
-        const dy = row - centerY;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        const angle = Math.atan2(dy, dx);
-        
-        // Convert to degrees for ray calculations
-        let degrees = (angle * 180 / Math.PI + 360) % 360;
-        
-        // Create flowing rays like the logo (12 organic rays)
-        const rayCount = 12;
-        const baseRayWidth = 360 / rayCount;
-        
-        // Organic flow with time animation
-        const wave1 = Math.sin(time * 0.8 + distance * 0.1 + angle * 2) * 6;
-        const wave2 = Math.cos(time * 1.2 + angle * 3) * 4;
-        const organicOffset = wave1 + wave2;
-        
-        // Find which ray we're in
-        const organicAngle = degrees + organicOffset;
-        const rayIndex = Math.floor(organicAngle / baseRayWidth);
-        const rayCenter = (rayIndex * baseRayWidth) % 360;
-        const angleFromRayCenter = Math.abs(((organicAngle - rayCenter + 180) % 360) - 180);
-        
-        // Ray width varies by distance (wider at base)
-        const rayWidthMultiplier = Math.max(0.4, 1.2 - distance / maxRadius);
-        const currentRayWidth = baseRayWidth * rayWidthMultiplier * (0.8 + Math.sin(time * 0.5 + rayIndex) * 0.2);
-        
-        // Animation pulse
-        const pulseIntensity = (Math.sin(time * 1.5 + rayIndex * 0.3) + 1) / 2;
-        
-        // Core sun (bright center)
-        const coreRadius = 6 + Math.sin(time * 1.2) * 1;
-        if (distance <= coreRadius) {
-          const coreIntensity = Math.max(0, 1 - (distance / coreRadius));
-          if (coreIntensity > 0.7) line += '█';
-          else if (coreIntensity > 0.5) line += '▓';
-          else if (coreIntensity > 0.3) line += '▒';
-          else line += '░';
-        }
-        // Ray area
-        else if (distance <= maxRadius && angleFromRayCenter <= currentRayWidth) {
-          const rayIntensity = (1 - (distance / maxRadius)) * pulseIntensity;
-          const rayDepth = 1 - (angleFromRayCenter / currentRayWidth);
-          const finalIntensity = rayIntensity * rayDepth;
-          
-          if (finalIntensity > 0.8) line += '█';
-          else if (finalIntensity > 0.6) line += '▓';
-          else if (finalIntensity > 0.4) line += '▒';
-          else if (finalIntensity > 0.25) line += '░';
-          else if (finalIntensity > 0.15) line += '∙';
-          else line += '·';
-        }
-        // Background space
-        else {
-          line += ' ';
-        }
-      }
-      patterns.push(line);
-    }
-    return patterns;
-  }, [isMobile, time]);
-
-  useEffect(() => {
-    setRayPattern(generateAdvancedAsciiRays());
-  }, [generateAdvancedAsciiRays]);
+  }, [dimensions]);
 
   return (
-    <div 
-      ref={containerRef}
-      className="relative w-full h-screen overflow-hidden bg-gradient-to-br from-red-600 via-red-500 to-orange-600"
-      style={{
-        fontFamily: 'monospace'
-      }}
-    >
-      {/* Static background - bright red/orange like logo */}
-      <div className="absolute inset-0 bg-gradient-radial from-red-400/40 via-red-500/60 to-red-700/80" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
-      
-      {/* Main ASCII Canvas - Much larger and visible */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <motion.div
-          className="relative font-mono leading-none select-none w-full text-center"
-          style={{
-            fontSize: isMobile ? '8px' : '12px', // Much larger for visibility
-            letterSpacing: isMobile ? '2px' : '3px', // More spacing
-            lineHeight: isMobile ? '8px' : '12px',
-          }}
-          animate={{
-            filter: `brightness(${1.1 + Math.sin(time * 1.5) * 0.1})`
-          }}
-          transition={{ duration: 0.1 }}
-        >
-          {/* Single clear, visible layer - white on red background */}
-          <motion.pre
-            className="relative z-10 text-white font-bold"
-            style={{
-              textShadow: '0 0 20px rgba(255, 255, 255, 0.8), 0 0 40px rgba(255, 255, 255, 0.5), 0 0 60px rgba(255, 255, 255, 0.3)',
-              filter: `drop-shadow(0 0 8px rgba(255, 255, 255, 0.9))`
-            }}
-          >
-            {rayPattern.map((line, index) => (
-              <motion.div
-                key={`main-${index}`}
-                animate={{
-                  opacity: [0.9, 1, 0.9]
-                }}
-                transition={{
-                  duration: 2 + Math.sin(index * 0.1) * 0.5,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: index * 0.02
-                }}
-              >
-                {line}
-              </motion.div>
-            ))}
-          </motion.pre>
-        </motion.div>
-      </div>
-
-      {/* Simple floating particles */}
-      {[...Array(isMobile ? 15 : 25)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute font-mono text-white/20 pointer-events-none"
-          style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            fontSize: `${Math.random() * 8 + 4}px`
-          }}
-          animate={{
-            opacity: [0.1, 0.4, 0.1],
-            y: [0, -20, 0],
-            rotate: [0, 360]
-          }}
-          transition={{
-            duration: Math.random() * 4 + 3,
-            repeat: Infinity,
-            delay: Math.random() * 2,
-            ease: "easeInOut"
-          }}
-        >
-          {['✦', '✧', '∙', '·', '*'][Math.floor(Math.random() * 5)]}
-        </motion.div>
-      ))}
-
-      {/* Simple edge gradient */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+    <div className="relative w-full h-screen overflow-hidden bg-black">
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 w-full h-full"
+        style={{
+          imageRendering: 'pixelated',
+          fontFamily: '"Courier New", monospace'
+        }}
+      />
     </div>
   );
 } 

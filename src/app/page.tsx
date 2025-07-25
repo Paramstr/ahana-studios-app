@@ -2,8 +2,11 @@
 
 import Image from "next/image";
 import { motion, useInView, AnimatePresence } from "framer-motion";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import { gsap } from "gsap";
+import { Observer } from "gsap/Observer";
 import SunRayFooter from "./components/SunRayFooter";
+import { ScrollProgress } from "@/components/ScrollProgress";
 
 export default function Home() {
 
@@ -133,6 +136,12 @@ export default function Home() {
   // State management
   const [selectedStory, setSelectedStory] = useState<string>("manufacturing-evolution");
   const [expandedPrinciple, setExpandedPrinciple] = useState<number | null>(null);
+  
+  // GSAP Timeline state
+  const [currentStep, setCurrentStep] = useState(0);
+  const [isTimelineActive, setIsTimelineActive] = useState(false);
+  const timelineRef = useRef<gsap.core.Timeline | null>(null);
+  const observerRef = useRef<any>(null);
 
   // Animation refs
   const heroRef = useRef(null);
@@ -149,6 +158,150 @@ export default function Home() {
   const isPrinciplesInView = useInView(principlesRef, { once: true, margin: "-100px" });
   const isTeamInView = useInView(teamRef, { once: true, margin: "-100px" });
 
+  // Register GSAP plugins
+  useEffect(() => {
+    gsap.registerPlugin(Observer);
+  }, []);
+
+  // Initialize GSAP timeline and Observer
+  useEffect(() => {
+    const timelineElement = processRef.current;
+    if (!timelineElement) return;
+
+    // Create the timeline for all steps
+    const tl = gsap.timeline({ paused: true });
+    
+    // Set initial states and create timeline animations
+    const progressLine = timelineElement.querySelector('[data-step="progress-line"]') as HTMLElement;
+    if (progressLine) {
+      gsap.set(progressLine, { height: "0%" });
+    }
+    
+    processSteps.forEach((_, index) => {
+      const stepContainer = timelineElement.querySelector(`[data-step="${index}"]`) as HTMLElement;
+      if (stepContainer) {
+        const circle = stepContainer.querySelector('.w-16') as HTMLElement;
+        const content = stepContainer.querySelector('.flex-1') as HTMLElement;
+        
+        if (circle) {
+          gsap.set(circle, { scale: 1, backgroundColor: "#ffffff" });
+          const span = circle.querySelector('span') as HTMLElement;
+          if (span) gsap.set(span, { color: "#000000" });
+        }
+        if (content) {
+          gsap.set(content, { opacity: 0.6 });
+        }
+      }
+    });
+    
+    // Animate each step progressively
+    processSteps.forEach((_, index) => {
+      const stepContainer = timelineElement.querySelector(`[data-step="${index}"]`) as HTMLElement;
+      if (stepContainer) {
+        const circle = stepContainer.querySelector('.w-16') as HTMLElement;
+        const content = stepContainer.querySelector('.flex-1') as HTMLElement;
+        const span = circle?.querySelector('span') as HTMLElement;
+        
+        tl.to(progressLine, {
+          height: `${((index + 1) / processSteps.length) * 100}%`,
+          duration: 0.8,
+          ease: "power2.out"
+        }, index * 0.5);
+        
+        if (circle) {
+          tl.to(circle, {
+            scale: 1.1,
+            backgroundColor: "#000000",
+            duration: 0.5,
+            ease: "power2.out"
+          }, index * 0.5);
+        }
+        
+        if (span) {
+          tl.to(span, {
+            color: "#ffffff",
+            duration: 0.5,
+            ease: "power2.out"
+          }, index * 0.5);
+        }
+        
+        if (content) {
+          tl.to(content, {
+            opacity: 1,
+            duration: 0.5,
+            ease: "power2.out"
+          }, index * 0.5 + 0.2);
+        }
+      }
+    });
+
+    timelineRef.current = tl;
+
+    // Intersection Observer to detect when timeline section is in view
+    const intersectionObserver = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.3) {
+          // Start GSAP Observer when timeline is visible
+          if (!observerRef.current && !isTimelineActive) {
+            setIsTimelineActive(true);
+            
+            observerRef.current = Observer.create({
+              type: "wheel,touch",
+              wheelSpeed: -1,
+              onDown: () => {
+                // Scroll down - progress timeline
+                const nextStep = Math.min(currentStep + 1, processSteps.length);
+                if (nextStep !== currentStep) {
+                  setCurrentStep(nextStep);
+                  const progress = nextStep / processSteps.length;
+                  tl.progress(progress);
+                  
+                  // If we've completed all steps, disable observer and resume normal scrolling
+                  if (nextStep >= processSteps.length) {
+                    setTimeout(() => {
+                      observerRef.current?.kill();
+                      observerRef.current = null;
+                      setIsTimelineActive(false);
+                      setCurrentStep(0);
+                    }, 500);
+                  }
+                }
+              },
+              onUp: () => {
+                // Scroll up - reverse timeline
+                const prevStep = Math.max(currentStep - 1, 0);
+                if (prevStep !== currentStep) {
+                  setCurrentStep(prevStep);
+                  const progress = prevStep / processSteps.length;
+                  tl.progress(progress);
+                }
+              }
+            });
+          }
+        } else if (!entry.isIntersecting && observerRef.current) {
+          // Clean up observer when leaving section
+          observerRef.current.kill();
+          observerRef.current = null;
+          setIsTimelineActive(false);
+          setCurrentStep(0);
+        }
+      },
+      {
+        threshold: [0, 0.3, 0.7, 1],
+        rootMargin: '0px'
+      }
+    );
+
+    intersectionObserver.observe(timelineElement);
+
+    return () => {
+      intersectionObserver.disconnect();
+      observerRef.current?.kill();
+      tl.kill();
+    };
+  }, [currentStep, isTimelineActive, processSteps.length]);
+
   // Get selected story data
   const selectedStoryData = transformationStories.find(story => story.id === selectedStory);
 
@@ -159,43 +312,183 @@ export default function Home() {
       {/* Main Content */}
       <main className="px-6 md:px-12 lg:px-16 xl:px-20">
         
-        {/* Refined Hero Section */}
+        {/* Enhanced Hero Section */}
         <motion.section 
           ref={heroRef}
-          className="py-20 md:py-24 lg:py-32 xl:py-40"
+          className="relative py-20 md:py-24 lg:py-32 xl:py-40 overflow-hidden"
         >
-          <div className="max-w-6xl mx-auto">
+          {/* Background Elements */}
+          <div className="absolute inset-0 -z-10">
+            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gray-50 rounded-full opacity-60 blur-3xl"></div>
+            <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gray-100 rounded-full opacity-40 blur-3xl"></div>
+          </div>
+
+          <div className="max-w-7xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={isHeroInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
               transition={{ duration: 1.2, delay: 0.2, ease: "easeOut" }}
-              className="text-center mb-16"
+              className="text-center mb-24"
             >
-              <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-light text-black leading-[0.9] tracking-tight mb-8">
-                Where your business meets AI
-              </h1>
-              <p className="text-xl md:text-2xl lg:text-2xl text-gray-600 leading-relaxed max-w-4xl mx-auto mb-12">
-                We&apos;re Ahana Studios. An AI development studio that transforms ambitious companies through intelligent systems that amplify human potential.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <button className="bg-black text-white px-8 py-3 text-sm font-medium tracking-tight hover:bg-gray-800 transition-all duration-200 hover:scale-105">
-                  Book a Strategy Call
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={isHeroInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
+                transition={{ duration: 1.5, delay: 0.3, ease: "easeOut" }}
+                className="mb-8"
+              >
+                <h1 className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-light text-black leading-[0.85] tracking-tight mb-6">
+                  AI. Built 
+                  <span className="block font-medium italic">beautifully.</span>
+                </h1>
+              </motion.div>
+              
+              <motion.p 
+                className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto mb-16"
+                initial={{ opacity: 0, y: 20 }}
+                animate={isHeroInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                transition={{ duration: 1.0, delay: 0.5, ease: "easeOut" }}
+              >
+                An AI development studio for founders.
+              </motion.p>
+              
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={isHeroInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                transition={{ duration: 0.8, delay: 0.7, ease: "easeOut" }}
+                className="inline-block"
+              >
+                <button className="group relative bg-black text-white px-12 py-4 text-base font-medium tracking-tight transition-all duration-300 hover:bg-gray-800 hover:scale-105 hover:shadow-xl overflow-hidden">
+                  <span className="relative z-10">Book a 30‑minute call</span>
+                  <motion.div 
+                    className="absolute inset-0 bg-gradient-to-r from-gray-800 to-black opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    initial={false}
+                    animate={{ x: [-100, 0] }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                  />
                 </button>
-                <p className="text-sm text-gray-500">
-                  Free 30-minute consultation
-                </p>
-              </div>
+              </motion.div>
             </motion.div>
 
-            {/* Subtle visual elements */}
+          </div>
+        </motion.section>
+
+        {/* Agency Statement */}
+        <motion.section 
+          className="py-16 md:py-20 lg:py-24"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.2, delay: 0.8, ease: "easeOut" }}
+        >
+          <div className="max-w-5xl mx-auto text-center">
             <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={isHeroInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
-              transition={{ duration: 1.5, delay: 0.6, ease: "easeOut" }}
-              className="flex justify-center"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1.0, delay: 1.0, ease: "easeOut" }}
             >
-              <div className="w-px h-24 bg-gradient-to-b from-transparent via-gray-300 to-transparent"></div>
+              <p className="text-2xl md:text-3xl lg:text-4xl font-light text-black leading-[1.3] tracking-tight">
+                We're a team of brand, product, and engineering experts building the{" "}
+                <span className="italic font-medium">world's most valuable brands</span>.
+                <br className="hidden md:block" />
+                <span className="block mt-2 md:mt-0 md:inline"> All while being at the forefront in AI.</span>
+              </p>
             </motion.div>
+          </div>
+        </motion.section>
+
+        {/* Timeline */}
+        <motion.section 
+          ref={processRef}
+          className={`py-16 md:py-20 lg:py-24 xl:py-28 border-t border-gray-100 relative ${
+            isTimelineActive ? 'timeline-active' : ''
+          }`}
+        >
+          {/* Scroll Hijack Indicator */}
+          {isTimelineActive && (
+            <motion.div
+              className="fixed top-4 right-4 z-50 bg-black text-white px-4 py-2 text-sm rounded-full"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{ duration: 0.3 }}
+            >
+              Scroll to progress • Step {currentStep}/{processSteps.length}
+            </motion.div>
+          )}
+          <div className="max-w-6xl mx-auto">
+            <div className="relative">
+              {/* Progress Line */}
+              <div className="absolute left-8 top-0 w-px h-full bg-gray-200"></div>
+              <div 
+                className="absolute left-8 top-0 w-px bg-black"
+                data-step="progress-line"
+                style={{
+                  height: `${(currentStep / processSteps.length) * 100}%`,
+                  transition: 'height 0.5s ease-out'
+                }}
+              />
+
+              {/* Steps */}
+              <div className="space-y-12 md:space-y-16">
+                {processSteps.map((step, index) => (
+                  <motion.div
+                    key={index}
+                    className="relative flex items-start gap-8 group"
+                    initial={{ opacity: 0, x: -30 }}
+                    animate={isProcessInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
+                    transition={{ duration: 0.6, delay: 0.3 + (index * 0.2), ease: "easeOut" }}
+                    data-step={index}
+                  >
+                    {/* Phase Number */}
+                    <div 
+                      className={`flex-shrink-0 w-16 h-16 border-2 rounded-full flex items-center justify-center relative z-10 transition-all duration-500 ${
+                        index < currentStep
+                          ? 'bg-black border-black scale-110'
+                          : 'bg-white border-black group-hover:bg-black'
+                      }`}
+                      data-step={index}
+                    >
+                      <span 
+                        className={`text-sm font-semibold transition-colors duration-500 ${
+                          index < currentStep
+                            ? 'text-white'
+                            : 'text-black group-hover:text-white'
+                        }`}
+                        data-step={index}
+                      >
+                        {String(index + 1).padStart(2, '0')}
+                      </span>
+                    </div>
+
+                    {/* Content */}
+                    <div 
+                      className={`flex-1 pb-8 transition-all duration-500 ${
+                        index < currentStep ? 'opacity-100' : 'opacity-60'
+                      }`}
+                      data-step={index}
+                    >
+                      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+                        <h3 
+                          className={`text-xl md:text-2xl font-semibold transition-colors duration-500 ${
+                            index < currentStep ? 'text-black' : 'text-gray-500'
+                          }`}
+                          data-step={index}
+                        >
+                          {step.title}
+                        </h3>
+                      </div>
+                      <p 
+                        className={`text-base leading-relaxed transition-colors duration-500 ${
+                          index < currentStep ? 'text-gray-700' : 'text-gray-400'
+                        }`}
+                        data-step={index}
+                      >
+                        {step.description}
+                      </p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
           </div>
         </motion.section>
 
@@ -315,70 +608,7 @@ export default function Home() {
           </div>
         </motion.section>
 
-        {/* Process Visualization */}
-        <motion.section 
-          ref={processRef}
-          className="py-20 md:py-24 lg:py-32 border-t border-gray-100"
-        >
-          <div className="max-w-7xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={isProcessInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-              transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-              className="text-center mb-20"
-            >
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-black leading-tight tracking-tight mb-8">
-                Our Process
-              </h2>
-              <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto">
-                Thoughtful transformation requires careful orchestration. Each step builds upon the last, creating systems that truly serve their purpose.
-              </p>
-            </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-16">
-              {processSteps.map((step, index) => (
-                <motion.div
-                  key={index}
-                  className="text-center group"
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={isProcessInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-                  transition={{ duration: 0.6, delay: 0.4 + (index * 0.2), ease: "easeOut" }}
-                >
-                  {/* Visual Element */}
-                  <div className="w-16 h-16 mx-auto mb-8 relative">
-                    <div className="absolute inset-0 bg-gray-100 rounded-full group-hover:bg-gray-200 transition-colors duration-300"></div>
-                    <div className="absolute inset-4 bg-black rounded-full group-hover:scale-110 transition-transform duration-300"></div>
-                    {index < processSteps.length - 1 && (
-                      <div className="hidden lg:block absolute top-8 left-16 w-full h-px bg-gray-200"></div>
-                    )}
-                  </div>
-
-                  <h3 className="text-lg font-semibold text-black mb-4">
-                    {step.title}
-                  </h3>
-                  <p className="text-sm text-gray-600 leading-relaxed">
-                    {step.description}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* CTA After Process */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={isProcessInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-              transition={{ duration: 0.8, delay: 1.0, ease: "easeOut" }}
-              className="text-center mt-20 pt-16 border-t border-gray-100"
-            >
-              <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-                Ready to start your AI transformation journey? Let&apos;s discuss your unique challenges and opportunities.
-              </p>
-              <button className="bg-black text-white px-8 py-3 text-sm font-medium tracking-tight hover:bg-gray-800 transition-all duration-200 hover:scale-105">
-                Schedule Your Discovery Call
-              </button>
-            </motion.div>
-          </div>
-        </motion.section>
 
 
         {/* Testimonial Section */}
@@ -558,79 +788,13 @@ export default function Home() {
           </div>
         </motion.section>
 
-        {/* Team Section */}
-        <motion.section 
-          ref={teamRef}
-          className="py-12 md:py-16 lg:py-20 xl:py-24 border-t border-gray-100"
-        >
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8 md:gap-10 lg:gap-12">
-            {teamMembers.map((member, index) => (
-              <motion.div 
-                key={index}
-                className="group cursor-pointer"
-                initial={{ opacity: 0, y: 30 }}
-                animate={isTeamInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-                transition={{ 
-                  duration: 0.6, 
-                  delay: 0.2 + (index * 0.1), 
-                  ease: "easeOut" 
-                }}
-              >
-                {/* Team Member Photo */}
-                <div className="relative aspect-[4/5] overflow-hidden bg-gray-100 mb-4 transition-all duration-500 group-hover:scale-[1.02]">
-                  <Image
-                    src={member.image}
-                    alt={member.alt}
-                    fill
-                    className="object-cover transition-all duration-700 group-hover:scale-105"
-                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
-                  />
-                  {/* Subtle overlay on hover */}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/3 transition-all duration-500"></div>
-                </div>
 
-                {/* Team Member Info */}
-                <div className="space-y-1">
-                  <h3 className="text-lg font-semibold text-black leading-tight tracking-tight">
-                    {member.name}
-                  </h3>
-                  <p className="text-sm font-normal text-gray-600 leading-relaxed">
-                    {member.role}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.section>
 
-        {/* Final CTA */}
-        <section className="py-16 md:py-20 lg:py-24 xl:py-28 text-center border-t border-gray-100">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={isTeamInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-            transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
-          >
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-black leading-tight tracking-tight mb-8">
-              Transform Your Business with AI
-            </h2>
-            <p className="text-lg md:text-xl text-gray-600 leading-relaxed mb-12 max-w-3xl mx-auto">
-              Every transformation begins with a conversation. In 30 minutes, we&apos;ll explore your challenges, identify AI opportunities, and map out a strategic path forward.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <button className="bg-black text-white px-10 py-4 text-base font-medium tracking-tight hover:bg-gray-800 transition-all duration-200 hover:scale-105">
-                Book Your Free Strategy Call
-              </button>
-              <div className="text-sm text-gray-500">
-                <p>✓ No commitment required</p>
-                <p>✓ Custom AI roadmap included</p>
-              </div>
-            </div>
-          </motion.div>
-        </section>
+
       </main>
 
       {/* Creative Sun Ray Footer */}
-      <SunRayFooter />
+      {/* <SunRayFooter /> */}
     </div>
   );
 }
