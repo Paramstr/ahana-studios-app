@@ -3,8 +3,6 @@
 import Image from "next/image";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useRef, useState } from "react";
-import SunRayFooter from "./components/SunRayFooter";
-import { ScrollProgress } from "@/components/ScrollProgress";
 
 export default function Home() {
 
@@ -68,39 +66,6 @@ export default function Home() {
   ];
 
 
-  // Team members data
-  const teamMembers = [
-    {
-      name: "Sarah Chen",
-      role: "CEO & Founder", 
-      image: "/faces/1.png",
-      alt: "Sarah Chen, CEO & Founder"
-    },
-    {
-      name: "Marcus Rodriguez",
-      role: "AI Research Director",
-      image: "/faces/2.png", 
-      alt: "Marcus Rodriguez, AI Research Director"
-    },
-    {
-      name: "Elena Petrov",
-      role: "Head of Product",
-      image: "/faces/3.png",
-      alt: "Elena Petrov, Head of Product"
-    },
-    {
-      name: "David Kim",
-      role: "Lead Engineer",
-      image: "/faces/4.png",
-      alt: "David Kim, Lead Engineer"
-    },
-    {
-      name: "Alex Thompson",
-      role: "Business Development",
-      image: "/faces/5.png",
-      alt: "Alex Thompson, Business Development"
-    }
-  ];
 
   // Testimonial data
   const testimonial = {
@@ -142,14 +107,12 @@ export default function Home() {
   const processRef = useRef(null);
   const testimonialRef = useRef(null);
   const principlesRef = useRef(null);
-  const teamRef = useRef(null);
   
   const isHeroInView = useInView(heroRef, { once: true, margin: "-100px" });
   const isStoriesInView = useInView(storiesRef, { once: true, margin: "-100px" });
   const isProcessInView = useInView(processRef, { once: true, margin: "-100px" });
   const isTestimonialInView = useInView(testimonialRef, { once: true, margin: "-100px" });
   const isPrinciplesInView = useInView(principlesRef, { once: true, margin: "-100px" });
-  const isTeamInView = useInView(teamRef, { once: true, margin: "-100px" });
 
 
   // Get selected story data
@@ -236,8 +199,8 @@ export default function Home() {
               transition={{ duration: 1.0, delay: 1.0, ease: "easeOut" }}
             >
               <p className="text-2xl md:text-3xl lg:text-4xl font-light text-black leading-[1.3] tracking-tight">
-                We're a team of brand, product, and engineering experts building the{" "}
-                <span className="italic font-medium">world's most valuable brands</span>.
+                We&apos;re a team of brand, product, and engineering experts building the{" "}
+                <span className="italic font-medium">world&apos;s most valuable brands</span>.
                 <br className="hidden md:block" />
                 <span className="block mt-2 md:mt-0 md:inline"> All while being at the forefront in AI.</span>
               </p>

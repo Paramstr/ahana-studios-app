@@ -13,7 +13,6 @@ export function LenisWrapper({ children }: { children: React.ReactNode }) {
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
-      smoothTouch: false,
       touchMultiplier: 2,
     });
 

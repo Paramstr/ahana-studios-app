@@ -44,7 +44,7 @@ export function ScrollProgress({ processSteps }: ScrollProgressProps) {
       }
 
       // Animate each step
-      stepsRefs.current.forEach((step, index) => {
+      stepsRefs.current.forEach((step) => {
         if (!step) return;
 
         const shape = step.querySelector('.shape');
@@ -145,7 +145,9 @@ export function ScrollProgress({ processSteps }: ScrollProgressProps) {
             {processSteps.map((step, index) => (
               <div
                 key={index}
-                ref={(el) => (stepsRefs.current[index] = el)}
+                ref={(el) => {
+                  if (el) stepsRefs.current[index] = el;
+                }}
                 className="text-center relative process-step"
               >
                 {/* Shape Container */}

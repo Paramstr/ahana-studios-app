@@ -170,7 +170,6 @@ export default function Portfolio() {
   const projectsRef = useRef(null);
   const isHeroInView = useInView(heroRef, { once: true, margin: "-100px" });
   const isFilterInView = useInView(filterRef, { once: true, margin: "-100px" });
-  const isProjectsInView = useInView(projectsRef, { once: true, margin: "-100px" });
 
   // Expandable project state
   const [expandedProject, setExpandedProject] = useState<number | null>(null);
@@ -448,7 +447,7 @@ export default function Portfolio() {
                           {/* Testimonial */}
                           <div className="border-l-4 border-gray-200 pl-6">
                             <blockquote className="text-lg text-gray-800 leading-relaxed mb-4">
-                              "{project.testimonial.quote}"
+                              &ldquo;{project.testimonial.quote}&rdquo;
                             </blockquote>
                             <div className="text-sm">
                               <div className="font-semibold text-black">{project.testimonial.author}</div>
