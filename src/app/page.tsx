@@ -2,9 +2,7 @@
 
 import Image from "next/image";
 import { motion, useInView, AnimatePresence } from "framer-motion";
-import { useRef, useState, useEffect } from "react";
-import { gsap } from "gsap";
-import { Observer } from "gsap/Observer";
+import { useRef, useState } from "react";
 import SunRayFooter from "./components/SunRayFooter";
 import { ScrollProgress } from "@/components/ScrollProgress";
 
@@ -137,11 +135,6 @@ export default function Home() {
   const [selectedStory, setSelectedStory] = useState<string>("manufacturing-evolution");
   const [expandedPrinciple, setExpandedPrinciple] = useState<number | null>(null);
   
-  // GSAP Timeline state
-  const [currentStep, setCurrentStep] = useState(0);
-  const [isTimelineActive, setIsTimelineActive] = useState(false);
-  const timelineRef = useRef<gsap.core.Timeline | null>(null);
-  const observerRef = useRef<any>(null);
 
   // Animation refs
   const heroRef = useRef(null);
@@ -158,149 +151,6 @@ export default function Home() {
   const isPrinciplesInView = useInView(principlesRef, { once: true, margin: "-100px" });
   const isTeamInView = useInView(teamRef, { once: true, margin: "-100px" });
 
-  // Register GSAP plugins
-  useEffect(() => {
-    gsap.registerPlugin(Observer);
-  }, []);
-
-  // Initialize GSAP timeline and Observer
-  useEffect(() => {
-    const timelineElement = processRef.current;
-    if (!timelineElement) return;
-
-    // Create the timeline for all steps
-    const tl = gsap.timeline({ paused: true });
-    
-    // Set initial states and create timeline animations
-    const progressLine = timelineElement.querySelector('[data-step="progress-line"]') as HTMLElement;
-    if (progressLine) {
-      gsap.set(progressLine, { height: "0%" });
-    }
-    
-    processSteps.forEach((_, index) => {
-      const stepContainer = timelineElement.querySelector(`[data-step="${index}"]`) as HTMLElement;
-      if (stepContainer) {
-        const circle = stepContainer.querySelector('.w-16') as HTMLElement;
-        const content = stepContainer.querySelector('.flex-1') as HTMLElement;
-        
-        if (circle) {
-          gsap.set(circle, { scale: 1, backgroundColor: "#ffffff" });
-          const span = circle.querySelector('span') as HTMLElement;
-          if (span) gsap.set(span, { color: "#000000" });
-        }
-        if (content) {
-          gsap.set(content, { opacity: 0.6 });
-        }
-      }
-    });
-    
-    // Animate each step progressively
-    processSteps.forEach((_, index) => {
-      const stepContainer = timelineElement.querySelector(`[data-step="${index}"]`) as HTMLElement;
-      if (stepContainer) {
-        const circle = stepContainer.querySelector('.w-16') as HTMLElement;
-        const content = stepContainer.querySelector('.flex-1') as HTMLElement;
-        const span = circle?.querySelector('span') as HTMLElement;
-        
-        tl.to(progressLine, {
-          height: `${((index + 1) / processSteps.length) * 100}%`,
-          duration: 0.8,
-          ease: "power2.out"
-        }, index * 0.5);
-        
-        if (circle) {
-          tl.to(circle, {
-            scale: 1.1,
-            backgroundColor: "#000000",
-            duration: 0.5,
-            ease: "power2.out"
-          }, index * 0.5);
-        }
-        
-        if (span) {
-          tl.to(span, {
-            color: "#ffffff",
-            duration: 0.5,
-            ease: "power2.out"
-          }, index * 0.5);
-        }
-        
-        if (content) {
-          tl.to(content, {
-            opacity: 1,
-            duration: 0.5,
-            ease: "power2.out"
-          }, index * 0.5 + 0.2);
-        }
-      }
-    });
-
-    timelineRef.current = tl;
-
-    // Intersection Observer to detect when timeline section is in view
-    const intersectionObserver = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        if (entry.isIntersecting && entry.intersectionRatio >= 0.3) {
-          // Start GSAP Observer when timeline is visible
-          if (!observerRef.current && !isTimelineActive) {
-            setIsTimelineActive(true);
-            
-            observerRef.current = Observer.create({
-              type: "wheel,touch",
-              wheelSpeed: -1,
-              onDown: () => {
-                // Scroll down - progress timeline
-                const nextStep = Math.min(currentStep + 1, processSteps.length);
-                if (nextStep !== currentStep) {
-                  setCurrentStep(nextStep);
-                  const progress = nextStep / processSteps.length;
-                  tl.progress(progress);
-                  
-                  // If we've completed all steps, disable observer and resume normal scrolling
-                  if (nextStep >= processSteps.length) {
-                    setTimeout(() => {
-                      observerRef.current?.kill();
-                      observerRef.current = null;
-                      setIsTimelineActive(false);
-                      setCurrentStep(0);
-                    }, 500);
-                  }
-                }
-              },
-              onUp: () => {
-                // Scroll up - reverse timeline
-                const prevStep = Math.max(currentStep - 1, 0);
-                if (prevStep !== currentStep) {
-                  setCurrentStep(prevStep);
-                  const progress = prevStep / processSteps.length;
-                  tl.progress(progress);
-                }
-              }
-            });
-          }
-        } else if (!entry.isIntersecting && observerRef.current) {
-          // Clean up observer when leaving section
-          observerRef.current.kill();
-          observerRef.current = null;
-          setIsTimelineActive(false);
-          setCurrentStep(0);
-        }
-      },
-      {
-        threshold: [0, 0.3, 0.7, 1],
-        rootMargin: '0px'
-      }
-    );
-
-    intersectionObserver.observe(timelineElement);
-
-    return () => {
-      intersectionObserver.disconnect();
-      observerRef.current?.kill();
-      tl.kill();
-    };
-  }, [currentStep, isTimelineActive, processSteps.length]);
 
   // Get selected story data
   const selectedStoryData = transformationStories.find(story => story.id === selectedStory);
@@ -398,34 +248,12 @@ export default function Home() {
         {/* Timeline */}
         <motion.section 
           ref={processRef}
-          className={`py-16 md:py-20 lg:py-24 xl:py-28 border-t border-gray-100 relative ${
-            isTimelineActive ? 'timeline-active' : ''
-          }`}
+          className="py-16 md:py-20 lg:py-24 xl:py-28 border-t border-gray-100"
         >
-          {/* Scroll Hijack Indicator */}
-          {isTimelineActive && (
-            <motion.div
-              className="fixed top-4 right-4 z-50 bg-black text-white px-4 py-2 text-sm rounded-full"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ duration: 0.3 }}
-            >
-              Scroll to progress • Step {currentStep}/{processSteps.length}
-            </motion.div>
-          )}
           <div className="max-w-6xl mx-auto">
             <div className="relative">
               {/* Progress Line */}
               <div className="absolute left-8 top-0 w-px h-full bg-gray-200"></div>
-              <div 
-                className="absolute left-8 top-0 w-px bg-black"
-                data-step="progress-line"
-                style={{
-                  height: `${(currentStep / processSteps.length) * 100}%`,
-                  transition: 'height 0.5s ease-out'
-                }}
-              />
 
               {/* Steps */}
               <div className="space-y-12 md:space-y-16">
@@ -436,52 +264,20 @@ export default function Home() {
                     initial={{ opacity: 0, x: -30 }}
                     animate={isProcessInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
                     transition={{ duration: 0.6, delay: 0.3 + (index * 0.2), ease: "easeOut" }}
-                    data-step={index}
                   >
                     {/* Phase Number */}
-                    <div 
-                      className={`flex-shrink-0 w-16 h-16 border-2 rounded-full flex items-center justify-center relative z-10 transition-all duration-500 ${
-                        index < currentStep
-                          ? 'bg-black border-black scale-110'
-                          : 'bg-white border-black group-hover:bg-black'
-                      }`}
-                      data-step={index}
-                    >
-                      <span 
-                        className={`text-sm font-semibold transition-colors duration-500 ${
-                          index < currentStep
-                            ? 'text-white'
-                            : 'text-black group-hover:text-white'
-                        }`}
-                        data-step={index}
-                      >
+                    <div className="flex-shrink-0 w-16 h-16 bg-white border-2 border-black rounded-full flex items-center justify-center relative z-10 group-hover:bg-black transition-colors duration-300">
+                      <span className="text-sm font-semibold text-black group-hover:text-white transition-colors duration-300">
                         {String(index + 1).padStart(2, '0')}
                       </span>
                     </div>
 
                     {/* Content */}
-                    <div 
-                      className={`flex-1 pb-8 transition-all duration-500 ${
-                        index < currentStep ? 'opacity-100' : 'opacity-60'
-                      }`}
-                      data-step={index}
-                    >
-                      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-                        <h3 
-                          className={`text-xl md:text-2xl font-semibold transition-colors duration-500 ${
-                            index < currentStep ? 'text-black' : 'text-gray-500'
-                          }`}
-                          data-step={index}
-                        >
-                          {step.title}
-                        </h3>
-                      </div>
-                      <p 
-                        className={`text-base leading-relaxed transition-colors duration-500 ${
-                          index < currentStep ? 'text-gray-700' : 'text-gray-400'
-                        }`}
-                        data-step={index}
-                      >
+                    <div className="flex-1 pb-8">
+                      <h3 className="text-xl md:text-2xl font-semibold text-black mb-4">
+                        {step.title}
+                      </h3>
+                      <p className="text-base text-gray-700 leading-relaxed">
                         {step.description}
                       </p>
                     </div>

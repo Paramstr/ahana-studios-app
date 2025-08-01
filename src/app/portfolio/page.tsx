@@ -15,25 +15,25 @@ export default function Portfolio() {
   const projects = [
     {
       id: 1,
-      title: "TechFlow Operations AI",
-      category: "Automation",
-      client: "TechFlow",
-      description: "Transformed customer service operations with intelligent automation, reducing response times by 85% while improving satisfaction scores.",
-      challenge: "Manual customer support processes were creating bottlenecks, with average response times of 24 hours and decreasing satisfaction scores.",
-      solution: "Implemented AI-powered ticket routing, automated response generation, and intelligent escalation systems with human oversight.",
+      title: "NuitritionOS - OMNI's in-house nutrition ordering system",
+      category: "Product Development",
+      client: "OMNI",
+      description: "Built a comprehensive in-house nutrition ordering system that seamlessly connects clinicians, meal planning specialists, and kitchen operations in one unified platform for personalized wellness nutrition.",
+      challenge: "OMNI's wellness programs were hampered by disconnected nutrition workflows—clinicians couldn't efficiently communicate dietary requirements, meal planners worked with outdated information, and kitchen staff struggled with complex dietary restrictions and timing.",
+      solution: "Developed an integrated nutrition management platform with real-time clinician-to-kitchen communication, AI-powered meal planning that considers individual health profiles, and automated inventory management with nutritional tracking.",
       metrics: {
-        responseTime: "85%",
-        satisfaction: "94%",
-        costReduction: "60%",
-        volume: "300%"
+        orderAccuracy: "98%",
+        preparationTime: "45%",
+        nutritionCompliance: "96%",
+        memberSatisfaction: "94%"
       },
-      image: "/hero/image-1.png",
+      image: "/Omni.png",
       testimonial: {
-        quote: "The AI system didn't just automate our processes—it reimagined how we serve our customers.",
-        author: "Rachel Morrison",
-        title: "CEO, TechFlow"
+        quote: "This system transformed our entire wellness approach—from fragmented processes to a seamless nutrition ecosystem that truly serves our members' health goals.",
+        author: "Dr. Anjali Sharma",
+        title: "Chief Wellness Officer, OMNI"
       },
-      technologies: ["GPT-4", "LangChain", "Python", "React"],
+      technologies: ["Node.js", "PostgreSQL", "React Native", "WebSocket"],
       timeline: "3 months",
       featured: true
     },

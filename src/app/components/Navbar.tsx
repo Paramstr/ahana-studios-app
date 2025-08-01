@@ -11,11 +11,10 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navigationItems = [
-    { label: "Home", href: "/" },
-    { label: "About", href: "/about" },
-    { label: "Services", href: "/services" },
-    { label: "Insights", href: "/insights" },
     { label: "Portfolio", href: "/portfolio" },
+    { label: "About us", href: "/about" },
+    // { label: "Services", href: "/services" },
+    // { label: "Insights", href: "/insights" },
   ];
 
   const isActive = (href: string) => pathname === href;
