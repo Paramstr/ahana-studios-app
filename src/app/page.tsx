@@ -11,8 +11,8 @@ export default function Home() {
   const transformationStories = [
     {
       id: "manufacturing-evolution",
-      title: "From Manual to Autonomous",
-      subtitle: "Manufacturing Renaissance",
+      title: "Omni - Nutrition Meal Ordering Platform",
+      subtitle: "Health Wellness Renaissance",
       story: "A century-old manufacturing company discovered that their greatest asset wasn't their machinery—it was their data. We helped them transform decades of operational knowledge into intelligent systems that now predict, adapt, and optimize in real-time.",
       outcome: "Operations that once required constant human oversight now run with precision and foresight.",
       visual: "/hero/image-1.png",
