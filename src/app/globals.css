@@ -69,3 +69,21 @@ body {
     color: #000000;
   }
 }
+
+/* Scroll Video Optimization */
+.video-loading {
+  animation: fadeOut 0.3s ease-out 0.5s forwards;
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+  }
+}
+
+/* Optimize video rendering */
+video {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}

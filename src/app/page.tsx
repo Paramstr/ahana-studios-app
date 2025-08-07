@@ -11,34 +11,23 @@ export default function Home() {
   const transformationStories = [
     {
       id: "manufacturing-evolution",
-      title: "Omni - Nutrition Meal Ordering Platform",
-      subtitle: "Health Wellness Renaissance",
-      story: "A century-old manufacturing company discovered that their greatest asset wasn't their machinery—it was their data. We helped them transform decades of operational knowledge into intelligent systems that now predict, adapt, and optimize in real-time.",
-      outcome: "Operations that once required constant human oversight now run with precision and foresight.",
-      visual: "/hero/image-1.png",
-      industry: "Manufacturing",
-      transformation: "Manual processes became intelligent workflows"
+      title: "Omni - Precision Nutrition Platform",
+      subtitle: "Precision Nutrition",
+      story: "Where nutritionist expertise meets macro precision. A complete ecosystem connecting meal planning, member customization, and seamless ordering, each dish crafted to exact specifications, every macro calculated, every meal purposeful.",
+      client: "Built for OMNI - A social wellness Social Club bridging longevity and health.",
+      visual: "/Products/NutritionOS-base.png",
     },
     {
       id: "customer-connection",
-      title: "Understanding at Scale",
-      subtitle: "Customer Intelligence Revolution",
-      story: "What began as a simple question—'How do we truly understand our customers?'—evolved into a comprehensive intelligence platform that reads between the lines of every interaction, anticipating needs before they're expressed.",
-      outcome: "Customer relationships transformed from reactive service to proactive partnership.",
-      visual: "/hero/image-2.png",
-      industry: "E-commerce",
-      transformation: "Data points became deep customer understanding"
+      title: "DONNA - AI Legal Research Assistant",
+      subtitle: "Intelligent Legal Research",
+      story: "An AI agent paired with a novel neural search engine. DONNA researches precedence across thousands of cases simultaneously, indexing with precision that scales seamlessly as case libraries grow. What takes teams days, DONNA delivers in moments.",
+      client: "Prototype for San Francisco Law AI startup",
+      visual: "/Products/Donna_AI.png",
+      industry: "Legal Tech",
+      transformation: "Hours of research condensed to minutes of insight"
     },
-    {
-      id: "decision-architecture",
-      title: "Intelligence in Every Decision",
-      subtitle: "Strategic Foresight",
-      story: "In a world of infinite data, the challenge isn't gathering information—it's knowing what matters. We architected systems that don't just report what happened, but illuminate what's possible.",
-      outcome: "Strategic decisions now backed by predictive intelligence rather than historical guesswork.",
-      visual: "/hero/image-3.png",
-      industry: "Finance",
-      transformation: "Reactive reports became predictive insights"
-    }
+
   ];
 
   // Process visualization - inspired by methodology graphics
@@ -69,12 +58,12 @@ export default function Home() {
 
   // Testimonial data
   const testimonial = {
-    quote: "Working with Ahana Studios has been transformative. Their AI integration didn't just automate our processes—it reimagined how we serve our customers. The results exceeded every expectation.",
+    quote: "Working with Ahana Studios has been transformative. Their AI integration didn't just automate our processes, it reimagined how we serve our customers. The results exceeded every expectation.",
     client: {
-      name: "Rachel Morrison",
-      title: "CEO & Co-Founder",
-      company: "TechFlow",
-      image: "/faces/1.png"
+      name: "Henry",
+      title: "Co-Founder",
+      company: "Omni",
+      image: "/faces/4.png"
     }
   };
 
@@ -99,6 +88,7 @@ export default function Home() {
   // State management
   const [selectedStory, setSelectedStory] = useState<string>("manufacturing-evolution");
   const [expandedPrinciple, setExpandedPrinciple] = useState<number | null>(null);
+  const [modalImage, setModalImage] = useState<string | null>(null);
   
 
   // Animation refs
@@ -310,9 +300,7 @@ export default function Home() {
                       <h3 className="text-2xl md:text-3xl lg:text-4xl font-light text-black mb-4">
                         {selectedStoryData.title}
                       </h3>
-                      <p className="text-base text-gray-500 mb-6">
-                        {selectedStoryData.industry}
-                      </p>
+
                     </div>
 
                     <p className="text-lg md:text-xl text-gray-700 leading-relaxed">
@@ -321,29 +309,31 @@ export default function Home() {
 
                     <div className="border-l-2 border-gray-200 pl-6">
                       <p className="text-base md:text-lg text-gray-600 leading-relaxed italic">
-                        {selectedStoryData.outcome}
+                        {selectedStoryData.client}
                       </p>
                     </div>
 
-                    <div className="pt-4">
-                      <p className="text-sm font-medium text-gray-500 mb-2">Transformation</p>
-                      <p className="text-base text-black">
-                        {selectedStoryData.transformation}
-                      </p>
-                    </div>
                   </div>
 
                   {/* Visual */}
                   <div className="lg:col-span-5">
-                    <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
+                    <div 
+                      className="relative aspect-[3/2] overflow-hidden bg-gray-100 cursor-pointer group"
+                      onClick={() => setModalImage(selectedStoryData.visual)}
+                    >
                       <Image
                         src={selectedStoryData.visual}
                         alt={selectedStoryData.title}
                         fill
-                        className="object-cover"
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
                         sizes="(max-width: 1024px) 100vw, 40vw"
                       />
                       <div className="absolute inset-0 bg-gradient-to-br from-black/10 to-transparent"></div>
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/20">
+                        <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                        </svg>
+                      </div>
                     </div>
                   </div>
                                  </motion.div>
@@ -551,6 +541,52 @@ export default function Home() {
 
 
       </main>
+
+      {/* Image Modal */}
+      <AnimatePresence>
+        {modalImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm"
+            onClick={() => setModalImage(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="relative max-w-7xl max-h-[90vh] w-full"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setModalImage(null)}
+                className="absolute -top-12 right-0 md:-top-4 md:-right-12 z-10 p-2 text-white hover:text-gray-300 transition-colors duration-200"
+                aria-label="Close modal"
+              >
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              
+              {/* Image Container */}
+              <div className="relative w-full h-full flex items-center justify-center">
+                <Image
+                  src={modalImage}
+                  alt="Expanded view"
+                  width={1920}
+                  height={1080}
+                  className="w-auto h-auto max-w-full max-h-[85vh] object-contain rounded-lg"
+                  priority
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Creative Sun Ray Footer */}
       {/* <SunRayFooter /> */}

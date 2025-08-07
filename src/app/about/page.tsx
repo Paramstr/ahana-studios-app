@@ -105,7 +105,6 @@ export default function Team() {
                 transition={{ duration: 1.0, delay: 0.6, ease: "easeOut" }}
               >
                 <video
-                  src="/sunrise-motion.mp4"
                   autoPlay
                   loop
                   muted
@@ -113,26 +112,18 @@ export default function Team() {
                   disablePictureInPicture
                   disableRemotePlayback
                   controls={false}
-                  className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                  className="absolute inset-0 w-full h-full object-cover"
                   style={{ 
-                    filter: 'brightness(0.95) contrast(1.05)'
-                  }}
-                  onLoadedData={(e) => {
-                    const video = e.target as HTMLVideoElement;
-                    video.playbackRate = 0.1;
-                  }}
-                  onCanPlay={(e) => {
-                    const video = e.target as HTMLVideoElement;
-                    video.playbackRate = 0.1;
-                  }}
-                  onPlay={(e) => {
-                    const video = e.target as HTMLVideoElement;
-                    video.playbackRate = 0.1;
+                    filter: 'brightness(0.95) contrast(1.10)'
                   }}
                   onContextMenu={(e) => e.preventDefault()}
                   preload="metadata"
                   aria-label="Ahana Studios sunrise motion background"
-                />
+                >
+                  <source src="/sunrise-motion.webm" type="video/webm" />
+                  <source src="/sunrise-motion.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
                 {/* Subtle overlay for elegance */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/5 via-transparent to-transparent"></div>
               </motion.div>
