@@ -9,153 +9,57 @@ export default function Portfolio() {
   const [activeFilter, setActiveFilter] = useState("All");
 
   // Filter options
-  const filterOptions = ["All", "Automation", "Products", "Ventures"];
+  const filterOptions = ["All", "Products"];
 
   // Portfolio projects data
   const projects = [
     {
       id: 1,
-      title: "NuitritionOS - OMNI's in-house nutrition ordering system",
-      category: "Product Development",
-      client: "OMNI",
-      description: "Built a comprehensive in-house nutrition ordering system that seamlessly connects clinicians, meal planning specialists, and kitchen operations in one unified platform for personalized wellness nutrition.",
-      challenge: "OMNI's wellness programs were hampered by disconnected nutrition workflows—clinicians couldn't efficiently communicate dietary requirements, meal planners worked with outdated information, and kitchen staff struggled with complex dietary restrictions and timing.",
-      solution: "Developed an integrated nutrition management platform with real-time clinician-to-kitchen communication, AI-powered meal planning that considers individual health profiles, and automated inventory management with nutritional tracking.",
+      title: "Omni - Precision Nutrition Platform",
+      category: "Products",
+      client: "OMNI Social Wellness Club",
+      description: "A complete ecosystem where nutritionists craft personalized meal plans with scientific precision. Every macro calculated, every preference considered, every meal purposeful. Built for a social wellness club bridging longevity and daily health.",
+      challenge: "OMNI's nutritionists were spending hours manually calculating macros and coordinating meal plans. Members received generic nutrition guidance that didn't account for their specific health goals or dietary restrictions. The disconnect between meal planning and ordering created inefficiencies.",
+      solution: "We built an integrated platform connecting meal planning, member customization, and seamless ordering. Each dish is crafted to exact specifications with macro precision, automated nutritionist workflows, and real-time member feedback integration.",
       metrics: {
-        orderAccuracy: "98%",
-        preparationTime: "45%",
-        nutritionCompliance: "96%",
-        memberSatisfaction: "94%"
+        mealPlansCreated: "500+",
+        macroPrecision: "±2%",
+        timeSavedDaily: "3 hours",
+        activeMembers: "200"
       },
-      image: "/Omni.png",
+      image: "/Products/NutritionOS-base.png",
       testimonial: {
-        quote: "This system transformed our entire wellness approach—from fragmented processes to a seamless nutrition ecosystem that truly serves our members' health goals.",
-        author: "Dr. Anjali Sharma",
-        title: "Chief Wellness Officer, OMNI"
+        quote: "This platform transformed how we deliver precision nutrition. Our members receive exactly what their bodies need, calculated to the gram, without any of the previous manual complexity.",
+        author: "Henry Chen",
+        title: "Co-Founder, OMNI"
       },
-      technologies: ["Node.js", "PostgreSQL", "React Native", "WebSocket"],
-      timeline: "3 months",
+      technologies: ["Next.js", "PostgreSQL", "Node.js", "Tailwind"],
+      timeline: "4 months",
       featured: true
     },
     {
       id: 2,
-      title: "Legal Document Analyzer",
+      title: "DONNA - AI Legal Research Assistant",
       category: "Products",
-      client: "Sterling Legal Partners",
-      description: "Built AI-powered legal document analysis platform that processes contracts 40x faster than traditional methods.",
-      challenge: "Legal document review was taking weeks, creating client delays and reducing firm profitability due to manual processes.",
-      solution: "Developed custom NLP models for legal text analysis, automated clause detection, and risk assessment with lawyer oversight.",
+      client: "San Francisco Law AI Startup",
+      description: "An AI agent paired with a novel neural search engine. DONNA researches precedence across thousands of cases simultaneously, indexing with precision that scales seamlessly as case libraries grow. Currently in pilot phase.",
+      challenge: "Legal research was consuming entire days of attorney time. Junior associates spent 70% of their time on case research rather than analysis. Law firms needed to surface relevant precedents across multiple jurisdictions quickly and accurately without compromising thoroughness.",
+      solution: "We developed an intelligent system that combines neural search with contextual understanding. DONNA reads case law like a senior partner, understanding precedent relationships and surfacing relevant cases across jurisdictions in moments rather than hours.",
       metrics: {
-        speed: "4000%",
-        accuracy: "97%",
-        billableHours: "35%",
-        clientSatisfaction: "92%"
+        casesIndexed: "10,000+",
+        researchTimeReduction: "75%",
+        jurisdictionsCovered: "3",
+        pilotFirms: "2"
       },
-      image: "/hero/image-2.png",
+      image: "/Products/Donna_AI.png",
       testimonial: {
-        quote: "This platform transformed our practice, allowing us to serve more clients with higher quality analysis.",
-        author: "David Sterling",
-        title: "Managing Partner, Sterling Legal"
+        quote: "DONNA doesn't replace our legal expertise, it amplifies it. What used to take days of research now happens in minutes, letting us focus on the strategic thinking that matters most.",
+        author: "Sarah Martinez",
+        title: "Senior Partner, Pilot Law Firm"
       },
-      technologies: ["Transformers", "spaCy", "FastAPI", "TypeScript"],
-      timeline: "4 months",
-      featured: true
-    },
-    {
-      id: 3,
-      title: "FinTech Startup MVP",
-      category: "Ventures",
-      client: "Nexus Financial",
-      description: "Zero-to-one AI-powered investment analysis platform that secured $2M seed funding within 6 months of launch.",
-      challenge: "Traditional investment analysis tools were too complex and expensive for emerging market traders and small investment firms.",
-      solution: "Created intuitive AI assistant that provides real-time market analysis, risk assessment, and personalized investment recommendations.",
-      metrics: {
-        funding: "$2M",
-        users: "10K",
-        retention: "78%",
-        timeToMarket: "6 months"
-      },
-      image: "/hero/image-3.png",
-      testimonial: {
-        quote: "Ahana Studios didn't just build our product—they helped us validate and scale our entire business model.",
-        author: "Sarah Kim",
-        title: "Founder, Nexus Financial"
-      },
-      technologies: ["Python", "TensorFlow", "Next.js", "PostgreSQL"],
+      technologies: ["Python", "Transformers", "Vector Search", "FastAPI"],
       timeline: "6 months",
-      featured: false
-    },
-    {
-      id: 4,
-      title: "Supply Chain Optimizer",
-      category: "Automation",
-      client: "GlobalTrade Corp",
-      description: "Intelligent supply chain management system that reduced costs by 30% while improving delivery reliability.",
-      challenge: "Complex global supply chain with multiple vendors was causing delays, cost overruns, and inventory inefficiencies.",
-      solution: "Built predictive analytics system with demand forecasting, route optimization, and automated vendor selection algorithms.",
-      metrics: {
-        costReduction: "30%",
-        onTimeDelivery: "96%",
-        inventoryTurnover: "45%",
-        carbonFootprint: "25%"
-      },
-      image: "/hero/image-1.png",
-      testimonial: {
-        quote: "The AI system optimizes our entire supply chain in real-time, something we never thought possible.",
-        author: "Michael Chen",
-        title: "COO, GlobalTrade Corp"
-      },
-      technologies: ["PyTorch", "Apache Kafka", "Docker", "AWS"],
-      timeline: "5 months",
-      featured: false
-    },
-    {
-      id: 5,
-      title: "Healthcare Analytics Platform",
-      category: "Products",
-      client: "MedTech Solutions",
-      description: "AI-driven patient outcome prediction system helping hospitals reduce readmission rates by 40%.",
-      challenge: "High patient readmission rates were affecting hospital quality scores and increasing costs significantly.",
-      solution: "Developed predictive models analyzing patient data, treatment patterns, and social determinants to identify at-risk patients.",
-      metrics: {
-        readmissionReduction: "40%",
-        costSavings: "$1.2M",
-        patientSatisfaction: "88%",
-        clinicianAdoption: "95%"
-      },
-      image: "/hero/image-2.png",
-      testimonial: {
-        quote: "This platform has revolutionized how we approach patient care and resource allocation.",
-        author: "Dr. Lisa Rodriguez",
-        title: "Chief Medical Officer, MedTech Solutions"
-      },
-      technologies: ["scikit-learn", "FHIR", "React", "PostgreSQL"],
-      timeline: "7 months",
-      featured: false
-    },
-    {
-      id: 6,
-      title: "Retail AI Assistant",
-      category: "Ventures",
-      client: "Smart Retail Ventures",
-      description: "Conversational AI shopping assistant that increased online conversion rates by 180% for e-commerce clients.",
-      challenge: "E-commerce platforms struggled with low conversion rates and high cart abandonment due to complex product discovery.",
-      solution: "Created intelligent shopping assistant with natural language processing, personalized recommendations, and seamless checkout integration.",
-      metrics: {
-        conversionIncrease: "180%",
-        cartAbandonment: "65%",
-        averageOrderValue: "25%",
-        customerLifetimeValue: "40%"
-      },
-      image: "/hero/image-3.png",
-      testimonial: {
-        quote: "The AI assistant feels like having a knowledgeable sales associate available 24/7 for every customer.",
-        author: "Jennifer Wu",
-        title: "CEO, Smart Retail Ventures"
-      },
-      technologies: ["OpenAI API", "Pinecone", "Next.js", "Stripe"],
-      timeline: "4 months",
-      featured: false
+      featured: true
     }
   ];
 
@@ -221,11 +125,11 @@ export default function Portfolio() {
               transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             >
               <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-light text-black leading-tight tracking-tight mb-6">
-                AI Transformations in Action
+                Recent Work
               </h1>
               <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-3xl mb-12">
-                Real stories of businesses that leveraged AI to unlock new possibilities, 
-                drive growth, and redefine their industries.
+                Two platforms we've built that demonstrate our approach to intelligent systems. 
+                Each designed to augment human expertise rather than replace it.
               </p>
             </motion.div>
 
@@ -238,27 +142,27 @@ export default function Portfolio() {
             >
               <div className="text-center">
                 <div className="text-3xl md:text-4xl font-light text-black mb-2">
-                  <AnimatedCounter value="50" suffix="+" />
+                  <AnimatedCounter value="2" suffix="" />
                 </div>
-                <div className="text-sm text-gray-600">Projects Delivered</div>
+                <div className="text-sm text-gray-600">Featured Projects</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl md:text-4xl font-light text-black mb-2">
-                  <AnimatedCounter value="25" suffix="M" />
+                  <AnimatedCounter value="700" suffix="+" />
                 </div>
-                <div className="text-sm text-gray-600">Revenue Generated</div>
+                <div className="text-sm text-gray-600">Users Served</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl md:text-4xl font-light text-black mb-2">
-                  <AnimatedCounter value="15" suffix="+" />
+                  <AnimatedCounter value="2" suffix="" />
                 </div>
-                <div className="text-sm text-gray-600">Industries Served</div>
+                <div className="text-sm text-gray-600">Industries</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl md:text-4xl font-light text-black mb-2">
-                  <AnimatedCounter value="95" suffix="%" />
+                  <AnimatedCounter value="10" suffix="K+" />
                 </div>
-                <div className="text-sm text-gray-600">Client Satisfaction</div>
+                <div className="text-sm text-gray-600">Cases Processed</div>
               </div>
             </motion.div>
           </div>
@@ -480,9 +384,9 @@ export default function Portfolio() {
             <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-8">
               Join the growing number of businesses transforming their operations with intelligent automation.
             </p>
-            <button className="bg-black text-white px-8 py-3 text-sm font-medium tracking-tight hover:bg-gray-800 transition-all duration-200 hover:scale-105">
+            <a href="https://calendar.notion.so/meet/paramstr/hello" target="_blank" rel="noopener noreferrer" className="bg-black text-white px-8 py-3 text-sm font-medium tracking-tight hover:bg-gray-800 transition-all duration-200 hover:scale-105 inline-block">
               Start Your Project
-            </button>
+            </a>
           </div>
         </section>
       </main>

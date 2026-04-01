@@ -22,20 +22,6 @@ export default function Team() {
       expertise: "Product Strategy & Neuroscience"
     },
     {
-      name: "Bilel",
-      role: "Sales & Account Manager",
-      bio: "The bridge between Ahana's innovative capabilities and client success. Bilel excels at understanding client needs and translating them into actionable solutions. His approach to sales is consultative and relationship-focused, ensuring every partnership creates lasting value for both sides.",
-      image: "/Founders/bilel-2.png",
-      expertise: "Sales & Client Relations"
-    },
-    {
-      name: "Edgar",
-      role: "Developer",
-      bio: "A skilled developer who recently launched Blaze Running Companion as a solo project. Edgar builds applications that feel native and intuitive, with a particular focus on mobile experiences. His attention to detail ensures every interaction feels perfectly calibrated.",
-      image: "/Faces/5.png",
-      expertise: "Mobile & Web Development"
-    },
-    {
       name: "Reynolds",
       role: "Head of Strategy",
       bio: "A strategic thinker who identifies emerging opportunities and builds meaningful partnerships. Reynolds combines market insight with operational excellence, helping organizations navigate their transformation journey. His approach ensures strategic decisions align with both immediate needs and long-term vision.",
@@ -147,7 +133,7 @@ export default function Team() {
                 Founders
               </h2>
               <p className="text-xl md:text-2xl text-gray-600 leading-relaxed max-w-4xl mx-auto">
-                Five exceptional individuals united by a shared vision to build AI that feels as natural as the sunrise. <strong>inevitable</strong>, <strong>beautiful</strong>, and <strong>inherently human</strong>.
+                Three exceptional individuals united by a shared vision to build AI that feels as natural as the sunrise. <strong>inevitable</strong>, <strong>beautiful</strong>, and <strong>inherently human</strong>.
               </p>
             </motion.div>
 

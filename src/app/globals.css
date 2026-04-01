@@ -23,11 +23,13 @@
   box-sizing: border-box;
 }
 
-html, body {
-  height: 100%;
+/* Lenis smooth scroll requires html/body height: auto */
+html.lenis, html.lenis body {
+  height: auto;
 }
 
 body {
+  min-height: 100vh;
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-inter);
@@ -83,7 +85,5 @@ body {
 
 /* Optimize video rendering */
 video {
-  will-change: transform;
-  transform: translateZ(0);
   backface-visibility: hidden;
 }

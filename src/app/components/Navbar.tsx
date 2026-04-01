@@ -11,13 +11,16 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navigationItems = [
-    { label: "Portfolio", href: "/portfolio" },
+    { label: "Portfolio", href: "/#portfolio" },
     { label: "About us", href: "/about" },
     // { label: "Services", href: "/services" },
     // { label: "Insights", href: "/insights" },
   ];
 
-  const isActive = (href: string) => pathname === href;
+  const isActive = (href: string) => {
+    if (href.startsWith("/#")) return pathname === "/";
+    return pathname === href;
+  };
 
   return (
     <header className="px-6 py-6 md:py-8 md:px-12 lg:px-16 xl:px-20 bg-white sticky top-0 z-50 border-b border-gray-100">
@@ -54,9 +57,9 @@ export default function Navbar() {
               ></span>
             </Link>
           ))}
-          <button className="bg-black text-white px-6 py-2.5 text-sm font-medium tracking-tight hover:bg-gray-800 transition-all duration-200 hover:scale-105">
+          <a href="https://calendar.notion.so/meet/paramstr/hello" target="_blank" rel="noopener noreferrer" className="bg-black text-white px-6 py-2.5 text-sm font-medium tracking-tight hover:bg-gray-800 transition-all duration-200 hover:scale-105 inline-block">
             Start Project
-          </button>
+          </a>
         </div>
 
         {/* Mobile Menu Button */}
@@ -95,9 +98,9 @@ export default function Navbar() {
                   {item.label}
                 </Link>
               ))}
-              <button className="bg-black text-white px-6 py-2.5 text-sm font-medium tracking-tight hover:bg-gray-800 transition-all duration-200 self-start">
+              <a href="https://calendar.notion.so/meet/paramstr/hello" target="_blank" rel="noopener noreferrer" className="bg-black text-white px-6 py-2.5 text-sm font-medium tracking-tight hover:bg-gray-800 transition-all duration-200 self-start inline-block">
                 Start Project
-              </button>
+              </a>
             </div>
           </motion.div>
         )}
