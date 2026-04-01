@@ -128,7 +128,7 @@ export default function Portfolio() {
                 Recent Work
               </h1>
               <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-3xl mb-12">
-                Two platforms we've built that demonstrate our approach to intelligent systems. 
+                Two platforms we&apos;ve built that demonstrate our approach to intelligent systems.
                 Each designed to augment human expertise rather than replace it.
               </p>
             </motion.div>
