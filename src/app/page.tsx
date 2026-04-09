@@ -75,7 +75,7 @@ export default function Home() {
       image: "/Products/NutritionOS-base.png",
       technologies: ["Next.js", "PostgreSQL", "Node.js", "Tailwind"],
       timeline: "4 months",
-      metrics: { "Meal Plans": "500+", "Macro Precision": "±2%", "Time Saved Daily": "3 hours", "Active Members": "200+" },
+      metrics: { "Active Members": "2,000+", "Meal Plans": "5,000+", "Meal Plan Revenue": "$50k+", "Macro Precision": "±2%" },
     },
     {
       id: 2,

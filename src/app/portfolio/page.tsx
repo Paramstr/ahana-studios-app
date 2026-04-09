@@ -22,10 +22,10 @@ export default function Portfolio() {
       challenge: "OMNI's nutritionists were spending hours manually calculating macros and coordinating meal plans. Members received generic nutrition guidance that didn't account for their specific health goals or dietary restrictions. The disconnect between meal planning and ordering created inefficiencies.",
       solution: "We built an integrated platform connecting meal planning, member customization, and seamless ordering. Each dish is crafted to exact specifications with macro precision, automated nutritionist workflows, and real-time member feedback integration.",
       metrics: {
-        mealPlansCreated: "500+",
-        macroPrecision: "±2%",
-        timeSavedDaily: "3 hours",
-        activeMembers: "200"
+        activeMembers: "2,000+",
+        mealPlansCreated: "5,000+",
+        mealPlanRevenue: "$50k+",
+        macroPrecision: "±2%"
       },
       image: "/Products/NutritionOS-base.png",
       testimonial: {
